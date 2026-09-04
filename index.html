@@ -3,131 +3,279 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>67 — gesture meme cam</title>
 <style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; }
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
-    margin: 0; height: 100dvh; overflow: hidden;
-    background: #0b0b0f; color: #e8e8ee;
+    margin: 0;
+    height: 100dvh;
+    overflow: hidden;
+    background: #0b0b0f;
+    color: #e8e8ee;
     font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
-    display: grid; place-items: center;
+    display: grid;
+    place-items: center;
   }
-  #stage { position: relative; width: 100%; height: 100%; }
-  video {
-    width: 100%; height: 100%; object-fit: cover;
-    transform: scaleX(-1);            /* mirror, so raising your right hand looks right */
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
+
+  /* The canvas takes the camera's own pixel dimensions and the same CSS box and
+     object-fit as the video, so the browser crops both identically and normalized
+     landmarks land on the right pixels with no transform math of our own. */
+  video,
+  #overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    /* mirror, so raising your right hand looks right */
+  }
+
+  #overlay {
+    pointer-events: none;
+  }
+
   #meme {
-    position: absolute; top: 50%; right: 4vw;
-    max-width: min(44vw, 520px); max-height: 78vh;
-    filter: drop-shadow(0 16px 50px rgba(0,0,0,.65));
-    opacity: 0; transition: opacity .18s ease, transform .18s ease;
+    position: absolute;
+    top: 50%;
+    right: 4vw;
+    max-width: min(44vw, 520px);
+    max-height: 78vh;
+    filter: drop-shadow(0 16px 50px rgba(0, 0, 0, .65));
+    opacity: 0;
+    transition: opacity .18s ease, transform .18s ease;
     transform: translate(28px, -50%) scale(.96);
     pointer-events: none;
   }
-  #meme.on { opacity: 1; transform: translate(0, -50%) scale(1); }
+
+  #meme.on {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+
   #hud {
-    position: absolute; top: 0; left: 0; right: 0; padding: 14px 18px;
-    display: flex; justify-content: space-between; gap: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
     background: linear-gradient(#000a, transparent);
     font-variant-numeric: tabular-nums;
   }
-  #label { font-weight: 600; letter-spacing: .01em; }
-  #hint { opacity: .65; font-size: 13px; text-align: right; }
-  #msg {
-    position: absolute; inset: 0; display: grid; place-items: center;
-    padding: 24px; text-align: center; background: #0b0b0f;
+
+  #label {
+    font-weight: 600;
+    letter-spacing: .01em;
   }
-  #msg[hidden] { display: none; }
+
+  #hint {
+    opacity: .65;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  #msg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    background: #0b0b0f;
+  }
+
+  #msg[hidden] {
+    display: none;
+  }
+
+  #debug {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #000000b0;
+    border: 1px solid #ffffff1a;
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre;
+    letter-spacing: .02em;
+  }
+
+  #debug .hit {
+    color: #7ee787;
+  }
+
+  #debug .dim {
+    opacity: .45;
+  }
+
   kbd {
-    font: inherit; background: #ffffff14; border: 1px solid #ffffff1f;
-    border-radius: 5px; padding: 1px 6px;
+    font: inherit;
+    background: #ffffff14;
+    border: 1px solid #ffffff1f;
+    border-radius: 5px;
+    padding: 1px 6px;
   }
 </style>
 
 <div id="stage">
   <video id="cam" autoplay playsinline muted></video>
+  <canvas id="overlay" hidden></canvas>
   <img id="meme" alt="">
   <div id="hud">
     <span id="label">—</span>
     <span id="hint">
-      ☝️ nerd &nbsp; 🙌 both palms = 67 &nbsp; 🤛🤜 fists pumping = dancing &nbsp; 👋 wave a palm = skuba
+      ☝️ nerd &nbsp; 🙌 palms up, bobbing = 67 &nbsp; 🤛🤜 fists pumping = dancing
+      &nbsp; 🤝 one hand still + wave the other = skuba
+      &nbsp;·&nbsp; <kbd>d</kbd> tracking
     </span>
   </div>
+  <pre id="debug" hidden></pre>
   <div id="msg">Loading the hand model…</div>
 </div>
 
 <script type="module">
-import { makeReader } from "./gestures.js";
+  import { makeReader, SHAKE } from "./gestures.js";
 
-const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
-const MEMES = ["67_cat", "nerd_cat", "skuba_cat", "dancing_cat"];
+  const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
+  const MEMES = ["67_cat", "nerd_cat", "skuba_cat", "dancing_cat"];
 
-const cam = document.getElementById("cam");
-const meme = document.getElementById("meme");
-const label = document.getElementById("label");
-const msg = document.getElementById("msg");
+  const cam = document.getElementById("cam");
+  const meme = document.getElementById("meme");
+  const label = document.getElementById("label");
+  const msg = document.getElementById("msg");
 
-// Warm the GIFs so the first gesture doesn't show a blank frame.
-const preloaded = Object.fromEntries(MEMES.map(n => {
-  const img = new Image();
-  img.src = `memes/${n}.gif`;
-  return [n, img.src];
-}));
+  // Warm the GIFs so the first gesture doesn't show a blank frame.
+  const preloaded = Object.fromEntries(MEMES.map(n => {
+    const img = new Image();
+    img.src = `memes/${n}.gif`;
+    return [n, img.src];
+  }));
 
-const fail = (text) => { msg.hidden = false; msg.textContent = text; };
+  const fail = (text) => { msg.hidden = false; msg.textContent = text; };
 
-let landmarker;
-try {
-  const { FilesetResolver, HandLandmarker } = await import(`${MP}/vision_bundle.mjs`);
-  const vision = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
-  landmarker = await HandLandmarker.createFromOptions(vision, {
-    baseOptions: {
-      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
-      delegate: "GPU",
-    },
-    runningMode: "VIDEO",
-    numHands: 2,
-  });
-} catch (e) {
-  fail(`Couldn't load the hand model. ${e.message}`);
-  throw e;
-}
+  let landmarker, drawUtils, CONNECTIONS;
+  try {
+    const { FilesetResolver, HandLandmarker, DrawingUtils } = await import(`${MP}/vision_bundle.mjs`);
+    CONNECTIONS = HandLandmarker.HAND_CONNECTIONS;
+    // Built here because DrawingUtils is scoped to this block.
+    drawUtils = new DrawingUtils(document.getElementById("overlay").getContext("2d"));
+    const vision = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
+    landmarker = await HandLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+        delegate: "GPU",
+      },
+      runningMode: "VIDEO",
+      numHands: 2,
+      // Below the 0.5 defaults on purpose: a hand pumping fast is blurred, and a
+      // strict threshold makes MediaPipe give up and fall back to re-running the
+      // palm detector, dropping frames right when the motion matters most.
+      minHandPresenceConfidence: 0.4,
+      minTrackingConfidence: 0.4,
+    });
+  } catch (e) {
+    fail(`Couldn't load the hand model. ${e.message}`);
+    throw e;
+  }
 
-msg.textContent = "Allow camera access to start.";
-try {
-  cam.srcObject = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: "user", width: { ideal: 1280 } },
-  });
-  await cam.play();
-} catch (e) {
-  // getUserMedia only exists on a secure context: https://, localhost or 127.0.0.1.
-  // Note that http://0.0.0.0 — what `python3 -m http.server` prints — is NOT one.
-  fail(navigator.mediaDevices
-    ? "Camera blocked. Allow it in your browser's address bar, then reload."
-    : `No camera on ${location.origin} — browsers only allow it on https://, ` +
+  msg.textContent = "Allow camera access to start.";
+  try {
+    cam.srcObject = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user", width: { ideal: 1280 } },
+    });
+    await cam.play();
+  } catch (e) {
+    // getUserMedia only exists on a secure context: https://, localhost or 127.0.0.1.
+    // Note that http://0.0.0.0 — what `python3 -m http.server` prints — is NOT one.
+    fail(navigator.mediaDevices
+      ? "Camera blocked. Allow it in your browser's address bar, then reload."
+      : `No camera on ${location.origin} — browsers only allow it on https://, ` +
       `http://localhost or http://127.0.0.1. Try http://localhost:${location.port || 80}.`);
-  throw e;
-}
-msg.hidden = true;
+    throw e;
+  }
+  msg.hidden = true;
 
-const read = makeReader({ hold: 5 });
-let lastTs = -1, shown = null;
+  const read = makeReader({ hold: 5, linger: 70 });   // ~3s});
+  const dbg = document.getElementById("debug");
+  const overlay = document.getElementById("overlay");
 
-function frame() {
-  // detectForVideo throws if handed the same timestamp twice.
-  if (cam.currentTime !== lastTs) {
-    lastTs = cam.currentTime;
-    const { landmarks, handedness } = landmarker.detectForVideo(cam, performance.now());
-    const gesture = read(landmarks, handedness);
+  // One key for "show me what the model sees": skeleton and readout together.
+  addEventListener("keydown", (e) => {
+    if (e.key !== "d") return;
+    dbg.hidden = overlay.hidden = !dbg.hidden;
+  });
 
-    if (gesture !== shown) {
-      shown = gesture;
-      label.textContent = gesture ? gesture.replace("_", " ") : "—";
-      if (gesture) meme.src = preloaded[gesture];
-      meme.classList.toggle("on", Boolean(gesture));
+  // Draw the 21 landmarks and the bone connections MediaPipe defines between them.
+  function drawSkeleton(hands) {
+    const ctx = overlay.getContext("2d");
+    if (overlay.width !== cam.videoWidth) {
+      overlay.width = cam.videoWidth;
+      overlay.height = cam.videoHeight;
+    }
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    for (const lm of hands) {
+      drawUtils.drawConnectors(lm, CONNECTIONS, { color: "#7ee787cc", lineWidth: 4 });
+      drawUtils.drawLandmarks(lm, { color: "#0b0b0f", fillColor: "#7ee787", lineWidth: 1, radius: 4 });
     }
   }
-  requestAnimationFrame(frame);
-}
-frame();
+
+  const FOUR = ["index", "middle", "ring", "pinky"];
+  const esc = (s) => String(s).replace(/[<&]/g, (c) => (c === "<" ? "&lt;" : "&amp;"));
+
+  // One line per hand: which fingers are extended, and how far the hand has
+  // travelled on each axis in the last 20 frames. ▲ marks a value over SHAKE.
+  function renderDebug(d) {
+    if (!d) return;
+    const travel = (v) => {
+      const over = v >= SHAKE;
+      return `<span class="${over ? "hit" : "dim"}">${over ? "▲" : " "}${v.toFixed(3)}</span>`;
+    };
+    const rows = d.hands.map((h) => {
+      const bits = FOUR.map((n) => (h.fingers[n]
+        ? `<span class="hit">${n[0].toUpperCase()}</span>`
+        : '<span class="dim">·</span>')).join("");
+      const thumb = h.fingers.thumb ? '<span class="hit">T</span>' : '<span class="dim">·</span>';
+      return `${esc(h.side).padEnd(5)} ${bits} ${thumb}   x${travel(h.motion.x)}  y${travel(h.motion.y)}`;
+    });
+    if (!rows.length) rows.push('<span class="dim">no hands</span>');
+    rows.push(`match ${esc(d.raw ?? "—").padEnd(12)} ${d.raw ? `${d.held}/${d.need} frames` : ""}`);
+    dbg.innerHTML = rows.join("\n");
+  }
+
+  let lastTs = -1, shown = null;
+
+  function frame() {
+    // detectForVideo throws if handed the same timestamp twice.
+    if (cam.currentTime !== lastTs) {
+      lastTs = cam.currentTime;
+      const { landmarks, handedness } = landmarker.detectForVideo(cam, performance.now());
+      const gesture = read(landmarks, handedness);
+
+      if (gesture !== shown) {
+        shown = gesture;
+        label.textContent = gesture ? gesture.replace("_", " ") : "—";
+        if (gesture) meme.src = preloaded[gesture];
+        meme.classList.toggle("on", Boolean(gesture));
+      }
+      if (!dbg.hidden) { renderDebug(read.debug); drawSkeleton(landmarks); }
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
 </script>
