@@ -1,0 +1,133 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>67 — gesture meme cam</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; height: 100dvh; overflow: hidden;
+    background: #0b0b0f; color: #e8e8ee;
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
+    display: grid; place-items: center;
+  }
+  #stage { position: relative; width: 100%; height: 100%; }
+  video {
+    width: 100%; height: 100%; object-fit: cover;
+    transform: scaleX(-1);            /* mirror, so raising your right hand looks right */
+  }
+  #meme {
+    position: absolute; top: 50%; right: 4vw;
+    max-width: min(44vw, 520px); max-height: 78vh;
+    filter: drop-shadow(0 16px 50px rgba(0,0,0,.65));
+    opacity: 0; transition: opacity .18s ease, transform .18s ease;
+    transform: translate(28px, -50%) scale(.96);
+    pointer-events: none;
+  }
+  #meme.on { opacity: 1; transform: translate(0, -50%) scale(1); }
+  #hud {
+    position: absolute; top: 0; left: 0; right: 0; padding: 14px 18px;
+    display: flex; justify-content: space-between; gap: 12px;
+    background: linear-gradient(#000a, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  #label { font-weight: 600; letter-spacing: .01em; }
+  #hint { opacity: .65; font-size: 13px; text-align: right; }
+  #msg {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    padding: 24px; text-align: center; background: #0b0b0f;
+  }
+  #msg[hidden] { display: none; }
+  kbd {
+    font: inherit; background: #ffffff14; border: 1px solid #ffffff1f;
+    border-radius: 5px; padding: 1px 6px;
+  }
+</style>
+
+<div id="stage">
+  <video id="cam" autoplay playsinline muted></video>
+  <img id="meme" alt="">
+  <div id="hud">
+    <span id="label">—</span>
+    <span id="hint">
+      ☝️ nerd &nbsp; 🙌 both palms = 67 &nbsp; 🤛🤜 fists pumping = dancing &nbsp; 👋 wave a palm = skuba
+    </span>
+  </div>
+  <div id="msg">Loading the hand model…</div>
+</div>
+
+<script type="module">
+import { makeReader } from "./gestures.js";
+
+const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
+const MEMES = ["67_cat", "nerd_cat", "skuba_cat", "dancing_cat"];
+
+const cam = document.getElementById("cam");
+const meme = document.getElementById("meme");
+const label = document.getElementById("label");
+const msg = document.getElementById("msg");
+
+// Warm the GIFs so the first gesture doesn't show a blank frame.
+const preloaded = Object.fromEntries(MEMES.map(n => {
+  const img = new Image();
+  img.src = `memes/${n}.gif`;
+  return [n, img.src];
+}));
+
+const fail = (text) => { msg.hidden = false; msg.textContent = text; };
+
+let landmarker;
+try {
+  const { FilesetResolver, HandLandmarker } = await import(`${MP}/vision_bundle.mjs`);
+  const vision = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
+  landmarker = await HandLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO",
+    numHands: 2,
+  });
+} catch (e) {
+  fail(`Couldn't load the hand model. ${e.message}`);
+  throw e;
+}
+
+msg.textContent = "Allow camera access to start.";
+try {
+  cam.srcObject = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "user", width: { ideal: 1280 } },
+  });
+  await cam.play();
+} catch (e) {
+  // getUserMedia only exists on a secure context: https://, localhost or 127.0.0.1.
+  // Note that http://0.0.0.0 — what `python3 -m http.server` prints — is NOT one.
+  fail(navigator.mediaDevices
+    ? "Camera blocked. Allow it in your browser's address bar, then reload."
+    : `No camera on ${location.origin} — browsers only allow it on https://, ` +
+      `http://localhost or http://127.0.0.1. Try http://localhost:${location.port || 80}.`);
+  throw e;
+}
+msg.hidden = true;
+
+const read = makeReader({ hold: 5 });
+let lastTs = -1, shown = null;
+
+function frame() {
+  // detectForVideo throws if handed the same timestamp twice.
+  if (cam.currentTime !== lastTs) {
+    lastTs = cam.currentTime;
+    const { landmarks, handedness } = landmarker.detectForVideo(cam, performance.now());
+    const gesture = read(landmarks, handedness);
+
+    if (gesture !== shown) {
+      shown = gesture;
+      label.textContent = gesture ? gesture.replace("_", " ") : "—";
+      if (gesture) meme.src = preloaded[gesture];
+      meme.classList.toggle("on", Boolean(gesture));
+    }
+  }
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
