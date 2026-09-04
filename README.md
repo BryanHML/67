@@ -8,12 +8,14 @@ leaves your device, so there's nothing to host but static files.
 | Gesture | Meme |
 |---|---|
 | ☝️ index finger up | nerd cat |
-| 🙌 both palms open | 67 cat |
+| 🙌 both palms to the sky, bobbing up and down | 67 cat |
 | 🤛🤜 two fists pumping up and down | dancing cat |
-| 👋 open palm waved side to side (hold your nose with the other hand) | skuba cat |
+| 🤝 both hands up: one held still, the other's palm waved side to side | skuba cat |
 
-The last two are *motion* gestures — held still they do nothing, because the app
-is watching a hand travel back and forth, not just its finger pose.
+All but nerd cat are *motion* gestures — held still they do nothing, because the
+app watches a hand travel back and forth, not just its finger pose. They are
+told apart by axis: 67 and dancing move vertically (open hands vs fists), skuba
+moves horizontally.
 
 ## Run it
 

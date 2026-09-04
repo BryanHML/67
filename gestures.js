@@ -8,9 +8,15 @@ const FINGERS = {
 
 const PALM = 9;          // middle-finger knuckle — steadier than the wrist for tracking
 const HISTORY = 20;      // ~1/3 second of positions
-const SHAKE = 0.05;      // min travel, as a fraction of the frame, to count as a shake
+const MISSING = 10;      // frames a hand may vanish for before its history is dropped
+const MATCH = 0.25;      // furthest a hand may jump between frames and still be the same hand
+export const SHAKE = 0.05;  // min travel, as a fraction of the frame, to count as a shake
 
-const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// 3D. MediaPipe's z is depth relative to the wrist, on roughly the same scale as
+// x. Including it is what keeps a foreshortened finger — one pointing away from
+// the camera, as in palms-to-the-sky — from projecting onto its own joint and
+// reading as curled. Falls back to flat 2D when landmarks carry no z.
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z ?? 0) - (b.z ?? 0));
 
 // A finger is extended when its tip reaches further from the wrist than its
 // middle joint does — curling folds the tip back toward the palm. Measuring
@@ -57,47 +63,90 @@ export function classify(hands, motion = []) {
   if (hands.length === 2 && states.every(fist) && (shaking(0, "y") || shaking(1, "y")))
     return "dancing_cat";                                  // two fists pumping up and down
 
-  // One open palm sweeping sideways while the other hand stays put (holding your
-  // nose). Requiring the other hand to be still is what stops a wobbly 67 — two
-  // palms up, both drifting — from being read as a wave.
+  // Both hands up: one open palm sweeping sideways, the other held still on
+  // both axes. The still hand's pose is not checked — it is whatever your hand
+  // does at your nose. Requiring it to be still is what separates this from 67
+  // (two open palms, both bobbing) and from a one-handed wave.
   const waving = states.findIndex((f, i) => open(f) && shaking(i, "x"));
-  if (waving !== -1 && !states.some((_, i) => i !== waving && shaking(i, "x")))
+  if (hands.length === 2 && waving !== -1 &&
+      !motion.some((m, i) => i !== waving && (shaking(i, "x") || shaking(i, "y"))))
     return "skuba_cat";
 
-  if (hands.length === 2 && states.every(open)) return "67_cat";
+  if (hands.length === 2 && states.every(open) && (shaking(0, "y") || shaking(1, "y")))
+    return "67_cat";                                       // palms to the sky, bobbing
 
-  const f = states[0];
-  if (f.index && !f.middle && !f.ring && !f.pinky) return "nerd_cat";  // pushing glasses up
-  return null;                                                         // fist / anything else
+  // `some`, not states[0]: MediaPipe orders hands arbitrarily, so checking only
+  // the first one made this fire or not depending on which hand it happened to
+  // list first whenever a second hand was in frame.
+  if (states.some((f) => f.index && !f.middle && !f.ring && !f.pinky))
+    return "nerd_cat";                                   // pushing glasses up
+  return null;                                           // fist / anything else
 }
 
 // Feed it every frame; it keeps the position history each motion gesture needs
 // and only commits a label once it holds for `hold` frames, so the meme doesn't
 // strobe while a finger sits on a threshold.
-export function makeReader({ hold = 5, history = HISTORY } = {}) {
-  const tracks = new Map();
-  let candidate = null, count = 0, committed = null;
+export function makeReader({ hold = 5, linger = 45, history = HISTORY } = {}) {
+  let tracks = [];
+  let candidate = null, count = 0, committed = null, idle = 0;
 
   return function read(hands = [], handedness = []) {
-    const seen = new Set();
-    const motion = hands.map((lm, i) => {
-      // Key by handedness so a history stays attached to the same physical hand
-      // even when MediaPipe reorders the results between frames.
-      const key = handedness[i]?.[0]?.categoryName ?? `hand${i}`;
-      seen.add(key);
-      const track = tracks.get(key) ?? [];
-      track.push({ x: lm[PALM].x, y: lm[PALM].y });
-      if (track.length > history) track.shift();
-      tracks.set(key, track);
-      return { x: oscillation(track, "x"), y: oscillation(track, "y") };
+    const taken = new Set();
+    const motion = hands.map((lm) => {
+      const pt = { x: lm[PALM].x, y: lm[PALM].y };
+      // Identity by position, not by MediaPipe's Left/Right label. That label is
+      // a classifier output and it flips between frames on a blurred or edge-on
+      // hand; keying histories on it swapped them, so a hand held still
+      // inherited the moving hand's travel and stopped counting as still.
+      // Nearest unclaimed track from last frame wins; a jump beyond MATCH means
+      // this is a different hand, not the same one moved, so it starts fresh.
+      let best = -1, bestDist = MATCH;
+      tracks.forEach((t, j) => {
+        if (taken.has(j)) return;
+        const last = t.points[t.points.length - 1];
+        const d = Math.hypot(pt.x - last.x, pt.y - last.y);
+        if (d < bestDist) { bestDist = d; best = j; }
+      });
+      if (best < 0) { tracks.push({ points: [], missed: 0 }); best = tracks.length - 1; }
+      taken.add(best);
+
+      const t = tracks[best];
+      t.missed = 0;
+      t.points.push(pt);
+      if (t.points.length > history) t.points.shift();
+      return { x: oscillation(t.points, "x"), y: oscillation(t.points, "y") };
     });
-    // Drop histories for hands that left the frame; stale ones read as motion.
-    for (const key of [...tracks.keys()]) if (!seen.has(key)) tracks.delete(key);
+
+    // Fast motion blurs frames and MediaPipe drops the hand for one or two of
+    // them. Discarding the history on the first miss emptied the oscillation
+    // window exactly when the hand was moving hardest, so the gesture only
+    // worked slowly. Hold across a short gap; drop after MISSING frames, before
+    // stale positions can read as fresh motion.
+    tracks.forEach((t, j) => { if (!taken.has(j)) t.missed++; });
+    tracks = tracks.filter((t) => t.missed <= MISSING);
 
     const label = classify(hands, motion);
     if (label === candidate) count++;
     else { candidate = label; count = 1; }
-    if (count >= hold) committed = candidate;
+    if (count >= hold && candidate) committed = candidate;
+
+    // Hold the last meme for `linger` frames after the gesture stops, so it
+    // doesn't vanish the instant you relax your hands. Any matching frame
+    // resets the countdown; a different gesture replaces this one as soon as it
+    // has held for `hold` frames, without waiting for the linger to run out.
+    idle = label ? 0 : idle + 1;
+    if (idle > linger) committed = null;
+
+    // Snapshot for the on-screen debug readout. Hung off the function so the
+    // return value stays a plain label and callers can ignore it entirely.
+    read.debug = {
+      raw: label, held: count, need: hold, committed,
+      hands: hands.map((lm, i) => ({
+        side: handedness[i]?.[0]?.categoryName ?? `hand${i}`,
+        fingers: fingersUp(lm),
+        motion: motion[i],
+      })),
+    };
     return committed;
   };
 }
