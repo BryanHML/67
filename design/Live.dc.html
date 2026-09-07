@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #d63c14; } a:hover { color: #a82d0d; }
+    .paper { background-color: #fffdf7; background-image: radial-gradient(#16141a08 1px, #0000 1px); background-size: 4px 4px; }
+    .disp { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+  </style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #101015; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #16141a;">
+  <div style="position: absolute; inset: 0; background: radial-gradient(120% 90% at 58% 42%, #2a2436 0%, #17151f 48%, #0e0d13 100%);"></div>
+  <svg viewBox="0 0 1280 800" style="position: absolute; inset: 0; width: 1280px; height: 800px;" fill="none">
+    <g stroke="#ffe14d" stroke-width="3.5" stroke-linecap="round" opacity="0.85">
+      <path d="M400 610 L368 514 L354 450 L346 412"/><circle cx="346" cy="412" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L400 506 L398 434 L396 392"/><circle cx="396" cy="392" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L432 514 L444 452 L450 416"/><circle cx="450" cy="416" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L460 532 L482 484 L496 458"/><circle cx="496" cy="458" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L344 576 L302 554"/><circle cx="302" cy="554" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M368 514 L400 506 L432 514 L460 532"/>
+    </g>
+  </svg>
+  <div style="position: absolute; top: 0; left: 0; right: 0; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 10px; background: #ffe14d; border: 2px solid #16141a; border-radius: 999px; padding: 7px 17px; box-shadow: 2px 2px 0 #16141a;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #d63c14;"></span>
+      <span class="disp" style="font-weight: 800; font-size: 16px; letter-spacing: -0.01em;">67</span><span style="font-size: 12px; font-weight: 600; color: #d63c14;">&nbsp;&middot;&nbsp;live</span>
+    </div>
+    <div style="display: flex; gap: 8px;"><span style="background: #fffdf7; border: 2px solid #16141a; border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; box-shadow: 2px 2px 0 #16141a;">D tracking</span><span style="background: #fffdf7; border: 2px solid #16141a; border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; box-shadow: 2px 2px 0 #16141a;">? gestures</span></div>
+  </div>
+
+  <!-- Fixed 400x400 slot. Every meme lands in this same box, object-fit: contain,
+       so the tile letterboxes rather than the image changing size. -->
+  <div style="position: absolute; top: 50%; right: 56px; transform: translateY(-50%); width: 440px;">
+    <div class="paper" style="border: 2px solid #16141a; border-radius: 20px; padding: 20px; box-shadow: 6px 6px 0 #16141a; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; place-items: center; width: 400px; height: 400px; background: #ffe14d; border: 2px solid #16141a; border-radius: 13px;"><svg viewBox="0 0 120 120" width="230" height="230" fill="none" stroke="#16141a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M28 46 24 20l22 14"/><path d="M92 46 96 20 74 34"/>
+        <path d="M60 30c19 0 34 14 34 33S79 98 60 98 26 82 26 63s15-33 34-33Z"/>
+        <path d="M47 58v5M73 58v5"/><path d="M55 76c3 3 7 3 10 0"/>
+        <path d="M18 66h16M86 66h16M20 76l14-4M86 72l14 4"/>
+      </svg></div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <span class="disp" style="font-weight: 800; font-size: 24px; letter-spacing: -0.02em;">dancing cat</span>
+        <span style="font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: #fffdf7; background: #d63c14; border-radius: 999px; padding: 5px 11px;">MOVE &#8597;</span>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; left: 24px; bottom: 24px; background: #fffdf7; border: 2px solid #16141a; border-radius: 13px; padding: 12px 16px; box-shadow: 3px 3px 0 #16141a; font: 12px/1.7 ui-monospace, Menlo, monospace; letter-spacing: 0.02em; white-space: pre;">Right  <span style="color:#d63c14; font-weight:600">····</span> ·   x 0.008  y<span style="color:#d63c14; font-weight:600">&#9650;0.094</span>
+Left   <span style="color:#d63c14; font-weight:600">····</span> ·   x 0.011  y<span style="color:#d63c14; font-weight:600">&#9650;0.087</span>
+match  dancing_cat  2 hands  5/5</div>
+  <div style="position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 9px;"><span style="display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #ffe14d; border: 2px solid #16141a; box-shadow: 2px 2px 0 #16141a;"><svg viewBox="0 0 26 26" width="22" height="22" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><span style="display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 2px 2px 0 #16141a;"><svg viewBox="0 0 26 26" width="22" height="22" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span><span style="display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 2px 2px 0 #16141a;"><svg viewBox="0 0 26 26" width="22" height="22" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14v-2"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><span style="display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 2px 2px 0 #16141a;"><svg viewBox="0 0 26 26" width="22" height="22" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span></div>
+</div>
+</x-dc>
+</body>
+</html>

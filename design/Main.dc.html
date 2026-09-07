@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #d63c14; } a:hover { color: #a82d0d; }
+    .paper { background-color: #fffdf7; background-image: radial-gradient(#16141a08 1px, #0000 1px); background-size: 4px 4px; }
+    .disp { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+  </style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #101015; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #16141a;">
+  <div style="position: absolute; inset: 0; background: radial-gradient(120% 90% at 58% 42%, #2a2436 0%, #17151f 48%, #0e0d13 100%);"></div>
+  <svg viewBox="0 0 1280 800" style="position: absolute; inset: 0; width: 1280px; height: 800px;" fill="none">
+    <g stroke="#ffe14d" stroke-width="3.5" stroke-linecap="round" opacity="0.4">
+      <path d="M400 610 L368 514 L354 450 L346 412"/><circle cx="346" cy="412" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L400 506 L398 434 L396 392"/><circle cx="396" cy="392" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L432 514 L444 452 L450 416"/><circle cx="450" cy="416" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L460 532 L482 484 L496 458"/><circle cx="496" cy="458" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M400 610 L344 576 L302 554"/><circle cx="302" cy="554" r="6" fill="#ffe14d" stroke="none"/>
+      <path d="M368 514 L400 506 L432 514 L460 532"/>
+    </g>
+  </svg>
+  <div style="position: absolute; top: 0; left: 0; right: 0; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 10px; background: #ffe14d; border: 2px solid #16141a; border-radius: 999px; padding: 7px 17px; box-shadow: 2px 2px 0 #16141a;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #d63c14;"></span>
+      <span class="disp" style="font-weight: 800; font-size: 16px; letter-spacing: -0.01em;">67</span>
+    </div>
+    <div style="display: flex; gap: 8px;"><span style="background: #fffdf7; border: 2px solid #16141a; border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; box-shadow: 2px 2px 0 #16141a;">D tracking</span><span style="background: #fffdf7; border: 2px solid #16141a; border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; box-shadow: 2px 2px 0 #16141a;">? gestures</span></div>
+  </div>
+
+  <div style="position: absolute; inset: 0; background: #0e0d13b8; display: grid; place-items: center;">
+    <div class="paper" style="width: 640px; border: 2px solid #16141a; border-radius: 22px; padding: 34px 38px 30px; box-shadow: 6px 6px 0 #16141a;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px;">
+        <div>
+          <div style="display: inline-block; background: #ffe14d; border: 2px solid #16141a; border-radius: 999px; padding: 4px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 14px;">HOW TO PLAY</div>
+          <h1 class="disp" style="margin: 0 0 10px; font-weight: 800; font-size: 46px; line-height: 0.96; letter-spacing: -0.025em; max-width: 14ch; text-wrap: pretty;">Make the shape.<br>Get the cat.</h1>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #6b6675; max-width: 46ch;">Hold it for about a second. The three marked <strong style="color: #d63c14;">MOVE</strong> need real movement &mdash; stay still and nothing happens.</p>
+        </div>
+        <button style="display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; background: #f4f0e6; border: 2px solid #16141a; border-radius: 999px; cursor: pointer; box-shadow: 2px 2px 0 #16141a;"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="#16141a" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px;">
+        <div style="display: flex; align-items: center; gap: 14px; background: #f4f0e6; border: 2px solid #16141a; border-radius: 14px; padding: 10px 14px;"><span style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #ffe14d; border: 2px solid #16141a; flex-shrink: 0;"><svg viewBox="0 0 26 26" width="23" height="23" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><div style="flex-grow: 1;"><div class="disp" style="font-weight: 600; font-size: 15px;">nerd cat</div><div style="font-size: 12.5px; color: #6b6675;">index finger up</div></div></div>
+        <div style="display: flex; align-items: center; gap: 14px; background: #f4f0e6; border: 2px solid #16141a; border-radius: 14px; padding: 10px 14px;"><span style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #ff7a4d; border: 2px solid #16141a; flex-shrink: 0;"><svg viewBox="0 0 26 26" width="23" height="23" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span><div style="flex-grow: 1;"><div class="disp" style="font-weight: 600; font-size: 15px;">67 cat</div><div style="font-size: 12.5px; color: #6b6675;">palms to the sky, bobbing</div></div><span style="font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: #fffdf7; background: #d63c14; border-radius: 999px; padding: 4px 10px; white-space: nowrap;">MOVE &#8597;</span></div>
+        <div style="display: flex; align-items: center; gap: 14px; background: #f4f0e6; border: 2px solid #16141a; border-radius: 14px; padding: 10px 14px;"><span style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #ff7a4d; border: 2px solid #16141a; flex-shrink: 0;"><svg viewBox="0 0 26 26" width="23" height="23" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14v-2"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><div style="flex-grow: 1;"><div class="disp" style="font-weight: 600; font-size: 15px;">dancing cat</div><div style="font-size: 12.5px; color: #6b6675;">two fists pumping up and down</div></div><span style="font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: #fffdf7; background: #d63c14; border-radius: 999px; padding: 4px 10px; white-space: nowrap;">MOVE &#8597;</span></div>
+        <div style="display: flex; align-items: center; gap: 14px; background: #f4f0e6; border: 2px solid #16141a; border-radius: 14px; padding: 10px 14px;"><span style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #ff7a4d; border: 2px solid #16141a; flex-shrink: 0;"><svg viewBox="0 0 26 26" width="23" height="23" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span><div style="flex-grow: 1;"><div class="disp" style="font-weight: 600; font-size: 15px;">skuba cat</div><div style="font-size: 12.5px; color: #6b6675;">one hand still, wave the other palm</div></div><span style="font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: #fffdf7; background: #d63c14; border-radius: 999px; padding: 4px 10px; white-space: nowrap;">MOVE &#8596;</span></div>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 18px;">
+        <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #6b6675; max-width: 34ch;">Runs entirely in your browser &mdash; the camera never leaves this device.</p>
+        <button class="disp" style="font-weight: 800; font-size: 16px; color: #fffdf7; background: #16141a; border: 2px solid #16141a; border-radius: 999px; padding: 14px 30px; cursor: pointer; box-shadow: 3px 3px 0 #ffe14d; white-space: nowrap;">Start camera</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

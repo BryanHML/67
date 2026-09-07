@@ -1,0 +1,132 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Sticker pop"
+    },
+    {
+      "id": "page-2",
+      "name": "Earlier directions"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Start.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "Start \u00b7 before the camera",
+      "page": "page-1"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 1400,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "Instructions",
+      "page": "page-1"
+    },
+    {
+      "file": "Live.dc.html",
+      "x": 2800,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "Live \u00b7 gesture matched",
+      "page": "page-1"
+    },
+    {
+      "file": "Mobile.dc.html",
+      "x": 0,
+      "y": 1010,
+      "w": 390,
+      "h": 680,
+      "title": "Phone \u00b7 instructions",
+      "page": "page-1"
+    },
+    {
+      "file": "MobileLive.dc.html",
+      "x": 510,
+      "y": 1010,
+      "w": 390,
+      "h": 844,
+      "title": "Phone \u00b7 live",
+      "page": "page-1"
+    },
+    {
+      "file": "Palette.dc.html",
+      "x": 1020,
+      "y": 1010,
+      "w": 1000,
+      "h": 860,
+      "title": "The system",
+      "page": "page-1"
+    },
+    {
+      "file": "DirectionA.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "A \u00b7 Terminal arcade",
+      "page": "page-2"
+    },
+    {
+      "file": "DirectionB.dc.html",
+      "x": 1400,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "B \u00b7 Broadcast editorial",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-flow",
+      "x": 0,
+      "y": -210,
+      "w": 560,
+      "text": "Sticker pop, four gestures.\nStart \u2192 Instructions \u2192 Live is the whole flow; phone views and the system sheet below.\n\nCamera feed and the cat are placeholders \u2014 the real GIFs drop into the same slot.",
+      "page": "page-1"
+    },
+    {
+      "id": "note-mobile",
+      "x": 0,
+      "y": 1740,
+      "w": 430,
+      "text": "Phone instructions \u2014 sized to the browser, not the device.\n\n390x680, not 390x844: on a 844pt phone the address bar and safe areas take roughly that much, and at full device height the layout left a dead band above the button. Content now fills the frame.\n\nRounded 30px so it reads as a screen rather than a slab.\n\nAlso: rows carry no shadow, and the MOVE pill is a single arrow \u2014 the word never fit without wrapping the gesture name.",
+      "page": "page-1"
+    },
+    {
+      "id": "note-mobile-live",
+      "x": 510,
+      "y": 1900,
+      "w": 430,
+      "text": "Phone live \u2014 the meme slot is stacked now, 300x300 above its label, full card width.\n\nSide-by-side capped the cat at about 150px, which was smaller than it needs to be on the one screen where the cat is the point.\n\nThe tracking readout stays desktop-only. Nobody tunes thresholds on a phone.\n\nBuild note: use 100dvh, not 100vh \u2014 mobile browser chrome collapses on scroll and 100vh cuts the gesture strip off.",
+      "page": "page-1"
+    },
+    {
+      "id": "note-old",
+      "x": 0,
+      "y": -150,
+      "w": 460,
+      "text": "Not chosen \u2014 kept for reference.",
+      "page": "page-2"
+    },
+    {
+      "id": "note-slot",
+      "x": 2800,
+      "y": 840,
+      "w": 470,
+      "page": "page-1",
+      "text": "Fixed 400x400 slot, object-fit: contain.\n\nThe old CSS was max-width: min(44vw, 520px), so every GIF rendered at its own natural size \u2014 nerd_cat at 127px next to skuba_cat at 498px. The box is constant now and the image letterboxes inside it.\n\n67_cat is 1.37 landscape, so it leaves ~54px of yellow top and bottom. That reads as a frame rather than dead space.\n\nnerd_cat upscales 3.1x and will be visibly soft. The real fix is a bigger source file."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}

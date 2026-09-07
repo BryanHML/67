@@ -46,12 +46,17 @@
     pointer-events: none;
   }
 
+  /* Fixed slot: every meme lands in the same box and letterboxes inside it,
+     rather than rendering at its own natural size — nerd_cat is 127px native
+     and skuba_cat is 498px, so left alone they appeared at wildly different
+     sizes. object-fit does the rest. */
   #meme {
     position: absolute;
     top: 50%;
     right: 4vw;
-    max-width: min(44vw, 520px);
-    max-height: 78vh;
+    width: 400px;
+    height: 400px;
+    object-fit: contain;
     filter: drop-shadow(0 16px 50px rgba(0, 0, 0, .65));
     opacity: 0;
     transition: opacity .18s ease, transform .18s ease;
@@ -124,6 +129,19 @@
     opacity: .45;
   }
 
+  @media (max-width: 640px) {
+    #meme {
+      width: 300px;
+      height: 300px;
+      right: 50%;
+      transform: translate(50%, -50%);
+    }
+
+    #meme.on {
+      transform: translate(50%, -50%) scale(1);
+    }
+  }
+
   kbd {
     font: inherit;
     background: #ffffff14;
@@ -136,7 +154,7 @@
 <div id="stage">
   <video id="cam" autoplay playsinline muted></video>
   <canvas id="overlay" hidden></canvas>
-  <img id="meme" alt="">
+  <video id="meme" muted loop playsinline preload="auto"></video>
   <div id="hud">
     <span id="label">—</span>
     <span id="hint">
@@ -153,6 +171,8 @@
   import { makeReader, SHAKE } from "./gestures.js";
 
   const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
+  // All four are looping MP4s: as GIFs they totalled 28.5 MB, which every
+  // visitor downloaded before seeing anything. Same clips, 203 KB.
   const MEMES = ["67_cat", "nerd_cat", "skuba_cat", "dancing_cat"];
 
   const cam = document.getElementById("cam");
@@ -160,11 +180,11 @@
   const label = document.getElementById("label");
   const msg = document.getElementById("msg");
 
-  // Warm the GIFs so the first gesture doesn't show a blank frame.
+  // Warm the HTTP cache so the first gesture doesn't show a blank frame.
   const preloaded = Object.fromEntries(MEMES.map(n => {
-    const img = new Image();
-    img.src = `memes/${n}.gif`;
-    return [n, img.src];
+    const url = `memes/${n}.mp4`;
+    fetch(url).catch(() => {});
+    return [n, url];
   }));
 
   const fail = (text) => { msg.hidden = false; msg.textContent = text; };
@@ -270,7 +290,12 @@
       if (gesture !== shown) {
         shown = gesture;
         label.textContent = gesture ? gesture.replace("_", " ") : "—";
-        if (gesture) meme.src = preloaded[gesture];
+        if (gesture) {
+          meme.src = preloaded[gesture];
+          // Muted autoplay is allowed, but play() still rejects if the tab is
+          // backgrounded — the meme just appears paused, which is survivable.
+          meme.play().catch(() => {});
+        }
         meme.classList.toggle("on", Boolean(gesture));
       }
       if (!dbg.hidden) { renderDebug(read.debug); drawSkeleton(landmarks); }

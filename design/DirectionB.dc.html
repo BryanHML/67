@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9a4a28; } a:hover { color: #7a3a1e; }
+  </style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #14130f; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #14130f;">
+
+  <div style="position: absolute; inset: 0; background: radial-gradient(120% 90% at 60% 40%, #2c2a24 0%, #1a1915 45%, #100f0c 100%);"></div>
+  <svg viewBox="0 0 1280 800" style="position: absolute; inset: 0; width: 1280px; height: 800px;" fill="none">
+    <g stroke="#e8dcc8" stroke-width="2.5" stroke-linecap="round" opacity="0.5">
+      <path d="M410 600 L378 504 L364 440 L356 402"/><circle cx="356" cy="402" r="4.5" fill="#e8dcc8" stroke="none"/>
+      <path d="M410 600 L410 496 L408 424 L406 382"/><circle cx="406" cy="382" r="4.5" fill="#e8dcc8" stroke="none"/>
+      <path d="M410 600 L442 504 L454 442 L460 406"/><circle cx="460" cy="406" r="4.5" fill="#e8dcc8" stroke="none"/>
+      <path d="M410 600 L470 522 L492 474 L506 448"/><circle cx="506" cy="448" r="4.5" fill="#e8dcc8" stroke="none"/>
+      <path d="M410 600 L354 566 L312 544"/><circle cx="312" cy="544" r="4.5" fill="#e8dcc8" stroke="none"/>
+      <path d="M378 504 L410 496 L442 504 L470 522"/>
+    </g>
+  </svg>
+
+  <!-- chrome: light pills over the dark feed -->
+  <div style="position: absolute; top: 0; left: 0; right: 0; padding: 22px 26px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 11px; background: #faf7f0; border-radius: 999px; padding: 7px 15px 7px 11px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: #b8472a;"></span>
+      <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 19px; line-height: 1;">Sixty&#8209;Seven</span>
+      <span style="font-size: 11px; color: #6b675c; letter-spacing: 0.05em;">RECORDING</span>
+    </div>
+    <div style="display: flex; gap: 7px; font-size: 11.5px; color: #faf7f0;">
+      <span style="border: 1px solid #faf7f033; border-radius: 999px; padding: 6px 13px;">Tracking &middot; D</span>
+      <span style="border: 1px solid #faf7f033; border-radius: 999px; padding: 6px 13px;">Gestures &middot; ?</span>
+    </div>
+  </div>
+
+  <!-- instructions -->
+  <div style="position: absolute; inset: 0; background: #100f0cad; display: grid; place-items: center;">
+    <div style="width: 620px; background: #faf7f0; border-radius: 5px; padding: 44px 48px 38px; box-shadow: 0 30px 80px #00000059;">
+
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 26px; padding-bottom: 22px; border-bottom: 1px solid #14130f1a;">
+        <h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 42px; line-height: 1.02; letter-spacing: -0.01em; max-width: 13ch; text-wrap: pretty;">Five gestures, five cats.</h1>
+        <span style="font-size: 11px; letter-spacing: 0.16em; color: #8a8578; white-space: nowrap;">HOW IT WORKS</span>
+      </div>
+
+      <p style="margin: 0 0 30px; font-size: 14.5px; line-height: 1.7; color: #4d4a41; max-width: 52ch;">Hold a shape for about a second and the matching cat appears. Three of the five want <em style="font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 16px;">movement</em> &mdash; held still, they do nothing at all.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; margin-bottom: 32px;">
+        <div style="display: flex; gap: 13px;">
+          <svg viewBox="0 0 26 26" width="24" height="24" fill="none" stroke="#b8472a" stroke-width="1.5" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg>
+          <div><div style="font-weight: 600; font-size: 14px; margin-bottom: 3px;">Nerd cat</div><div style="font-size: 13px; line-height: 1.5; color: #6b675c;">Index finger up, the rest curled.</div></div>
+        </div>
+        <div style="display: flex; gap: 13px;">
+          <svg viewBox="0 0 26 26" width="24" height="24" fill="none" stroke="#b8472a" stroke-width="1.5" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5.5"/><path d="M11.5 14V4"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg>
+          <div><div style="font-weight: 600; font-size: 14px; margin-bottom: 3px;">67 cat <span style="font-weight: 400; color: #b8472a; font-size: 12px;">&#8597; moving</span></div><div style="font-size: 13px; line-height: 1.5; color: #6b675c;">Palms to the sky, bobbing up and down.</div></div>
+        </div>
+        <div style="display: flex; gap: 13px;">
+          <svg viewBox="0 0 26 26" width="24" height="24" fill="none" stroke="#b8472a" stroke-width="1.5" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14v-2"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg>
+          <div><div style="font-weight: 600; font-size: 14px; margin-bottom: 3px;">Dancing cat <span style="font-weight: 400; color: #b8472a; font-size: 12px;">&#8597; moving</span></div><div style="font-size: 13px; line-height: 1.5; color: #6b675c;">Two fists pumping up and down.</div></div>
+        </div>
+        <div style="display: flex; gap: 13px;">
+          <svg viewBox="0 0 26 26" width="24" height="24" fill="none" stroke="#b8472a" stroke-width="1.5" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5.5"/><path d="M11.5 14V4"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg>
+          <div><div style="font-weight: 600; font-size: 14px; margin-bottom: 3px;">Skuba cat <span style="font-weight: 400; color: #b8472a; font-size: 12px;">&#8596; moving</span></div><div style="font-size: 13px; line-height: 1.5; color: #6b675c;">One hand still, wave the other palm sideways.</div></div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 24px; border-top: 1px solid #14130f1a;">
+        <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: #8a8578; max-width: 34ch;">Everything runs in your browser. The camera feed never leaves this device.</p>
+        <button style="font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 500; color: #faf7f0; background: #14130f; border: 0; border-radius: 4px; padding: 13px 26px; cursor: pointer; white-space: nowrap;">Start camera</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

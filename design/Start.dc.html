@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #d63c14; } a:hover { color: #a82d0d; }
+    .paper { background-color: #fffdf7; background-image: radial-gradient(#16141a08 1px, #0000 1px); background-size: 4px 4px; }
+    .disp { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+  </style>
+</helmet>
+
+<div class="paper" style="width: 1280px; height: 800px; position: relative; overflow: hidden; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #16141a; display: grid; place-items: center;">
+  <div style="position: absolute; inset: 0; background: radial-gradient(90% 70% at 50% 0%, #ffe14d3d 0%, #0000 70%);"></div>
+  <div style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 640px; padding: 0 40px;">
+    <div style="display: flex; gap: 12px; margin-bottom: 30px;"><span style="display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: #ffe14d; border: 2px solid #16141a; box-shadow: 3px 3px 0 #16141a; transform: rotate(-7deg);"><svg viewBox="0 0 26 26" width="33" height="33" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><span style="display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 3px 3px 0 #16141a; transform: rotate(4deg);"><svg viewBox="0 0 26 26" width="33" height="33" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span><span style="display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 3px 3px 0 #16141a; transform: rotate(-3deg);"><svg viewBox="0 0 26 26" width="33" height="33" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14v-2"/><path d="M11.5 14v-2"/><path d="M15 14v-2"/><path d="M18 14v-2"/><path d="M5.5 17 3.5 15.8"/></svg></span><span style="display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: #ff7a4d; border: 2px solid #16141a; box-shadow: 3px 3px 0 #16141a; transform: rotate(6deg);"><svg viewBox="0 0 26 26" width="33" height="33" fill="none" stroke="#16141a" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/><path d="M8 14V5"/><path d="M11.5 14V3.5"/><path d="M15 14V5"/><path d="M18 14V7"/><path d="M5.5 17 2.8 15"/></svg></span></div>
+    <h1 class="disp" style="margin: 0 0 16px; font-weight: 800; font-size: 68px; line-height: 0.92; letter-spacing: -0.035em; text-wrap: pretty;">Sixty&#8209;seven</h1>
+    <p style="margin: 0 0 34px; font-size: 17px; line-height: 1.55; color: #6b6675; max-width: 34ch;">Four hand gestures. Four cats. Your camera never leaves this device.</p>
+    <button class="disp" style="font-weight: 800; font-size: 19px; color: #fffdf7; background: #16141a; border: 2px solid #16141a; border-radius: 999px; padding: 17px 42px; cursor: pointer; box-shadow: 5px 5px 0 #ffe14d;">Allow camera &amp; start</button>
+    <p style="margin: 18px 0 0; font-size: 12.5px; color: #6b6675;">Your browser will ask permission next.</p>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -10,8 +10,9 @@ wheels/
 .venv
 .DS_Store
 
-
-# formats
+# Source screen recordings stay local — only the meme clips the app plays are tracked.
 *.mp4
+!memes/*.mp4
 
-
+# generated design canvas — rebuild with design/_lib.py + seed-canvas
+design/gesture-cam-directions.html
