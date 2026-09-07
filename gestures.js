@@ -70,7 +70,7 @@ export function classify(hands, motion = []) {
   const waving = states.findIndex((f, i) => open(f) && shaking(i, "x"));
   if (hands.length === 2 && waving !== -1 &&
       !motion.some((m, i) => i !== waving && (shaking(i, "x") || shaking(i, "y"))))
-    return "skuba_cat";
+    return "scuba_cat";
 
   if (hands.length === 2 && states.every(open) && (shaking(0, "y") || shaking(1, "y")))
     return "67_cat";                                       // palms to the sky, bobbing

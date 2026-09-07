@@ -6,7 +6,7 @@ Try it on my [demo site](https://bryanhml.github.io/67/) or run it entirely in t
 
 Three of the four are *motion* gestures — held still they do nothing, because
 the app watches a hand travel back and forth, not just its finger pose. They are
-told apart by axis: 67 and dancing move vertically (open hands vs fists), skuba
+told apart by axis: 67 and dancing move vertically (open hands vs fists), scuba
 moves horizontally.
 
 ## The gestures
@@ -29,11 +29,11 @@ Both fists, pumping up and down.
 
 ![dancing cat gesture](demo/dancing_cat.gif)
 
-### 🤝 skuba cat — one hand still, wave the other
+### 🤝 scuba cat — one hand still, wave the other
 
 Both hands up. Hold one still and wave the other palm side to side.
 
-![skuba cat gesture](demo/skuba_cat.gif)
+![scuba cat gesture](demo/scuba_cat.gif)
 
 ## Run it
 

@@ -53,7 +53,7 @@ assert.strictEqual(classify([rotate(palm, 45), rotate(palm, -45)], [shakeY, shak
   "67 survives hands tilted toward each other");
 
 // --- foreshortening: fingers pointing away from the camera -----------------
-// Palms to the sky (67) and a handshake-oriented palm (skuba) both aim the
+// Palms to the sky (67) and a handshake-oriented palm (scuba) both aim the
 // fingers away from the lens. Their tips then project almost onto their own
 // joints, so a flat 2D distance reads them as curled — which used to make
 // palms-up 67 look like two fists, i.e. dancing_cat. z recovers the depth.
@@ -84,7 +84,7 @@ assert.ok(!OPEN.every((n) => fingersUp(flat(awayPalm))[n]),
   "sanity: without z this same hand reads as curled — that was the bug");
 assert.strictEqual(classify([awayPalm, awayPalm], [shakeY, shakeY]), "67_cat",
   "palms to the sky, bobbing vertically");
-assert.strictEqual(classify([awayPalm, awayHand([])], [shakeX, still]), "skuba_cat",
+assert.strictEqual(classify([awayPalm, awayHand([])], [shakeX, still]), "scuba_cat",
   "handshake-oriented palm waved sideways, other hand still");
 
 // --- oscillation ------------------------------------------------------------
@@ -109,10 +109,10 @@ assert.strictEqual(classify([fist, fist], [shakeY, shakeY]), "dancing_cat");
 assert.strictEqual(classify([fist, fist], [still, still]), null, "two idle fists are not dancing");
 assert.strictEqual(classify([fist, fist], [shakeX, shakeX]), null, "fists must move vertically");
 
-// skuba: both hands up, one open palm sweeping sideways, the other held still.
-assert.strictEqual(classify([fist, palm], [still, shakeX]), "skuba_cat");
-assert.strictEqual(classify([palm, fist], [shakeX, still]), "skuba_cat", "hand order is irrelevant");
-assert.strictEqual(classify([palm, palm], [still, shakeX]), "skuba_cat",
+// scuba: both hands up, one open palm sweeping sideways, the other held still.
+assert.strictEqual(classify([fist, palm], [still, shakeX]), "scuba_cat");
+assert.strictEqual(classify([palm, fist], [shakeX, still]), "scuba_cat", "hand order is irrelevant");
+assert.strictEqual(classify([palm, palm], [still, shakeX]), "scuba_cat",
   "the still hand's pose is not checked");
 assert.strictEqual(classify([palm], [shakeX]), null, "one hand is not enough");
 assert.strictEqual(classify([palm, fist], [shakeX, shakeY]), null,
@@ -130,7 +130,7 @@ assert.strictEqual(read([point], handed("Right")), "nerd_cat");
 assert.strictEqual(read([palm, palm], handed("Left", "Right")), "nerd_cat",
   "a single stray frame must not switch memes");
 
-// Waving one palm across frames must build enough x-travel to read as skuba.
+// Waving one palm across frames must build enough x-travel to read as scuba.
 const sides = handed("Right", "Left");
 const held = hand({ at: 0.85 });                   // the other hand, fed unmoving
 const waveFrame = (r, i, hands = null) =>
@@ -139,7 +139,7 @@ const waveFrame = (r, i, hands = null) =>
 const wave = makeReader({ hold: 2 });
 let got = null;
 for (let i = 0; i < 24; i++) got = waveFrame(wave, i);
-assert.strictEqual(got, "skuba_cat", "reader must accumulate motion history itself");
+assert.strictEqual(got, "scuba_cat", "reader must accumulate motion history itself");
 
 // Dropouts. A hand that blinks out for a frame or two — what fast motion causes
 // — must keep its history, or the oscillation window empties exactly when the
@@ -152,22 +152,22 @@ const blink = makeReader({ hold: 1, linger: 0 });
 waveFrames(blink, 24);
 blink([], []);                                   // two dropped frames mid-wave
 blink([], []);
-assert.strictEqual(blink(resume, sides), "skuba_cat",
+assert.strictEqual(blink(resume, sides), "scuba_cat",
   "a brief dropout must not erase the motion history");
 
 // Same resumed frame, but after a gap long enough to drop the history. Every
-// other condition for skuba still holds, so only the cleared history can be
+// other condition for scuba still holds, so only the cleared history can be
 // what stops it — which is the point of the assertion.
 const gone = makeReader({ hold: 1, linger: 0 });
 waveFrames(gone, 24);
 for (let i = 0; i < 12; i++) gone([], []);       // hand is gone for good
 assert.strictEqual(gone([], []), null, "empty frame clears the label");
-assert.strictEqual(gone(resume, sides), null, "stale history must not fire skuba");
+assert.strictEqual(gone(resume, sides), null, "stale history must not fire scuba");
 
 // --- hand identity survives a flipping handedness label --------------------
 // MediaPipe's Left/Right is a classifier output and it flips between frames on
 // a blurred or edge-on hand. Keying motion histories on it swapped them, so the
-// hand held still inherited the waving hand's travel and skuba never fired.
+// hand held still inherited the waving hand's travel and scuba never fired.
 // Identity now comes from position, so the label may flip freely.
 const flip = makeReader({ hold: 2 });
 let flipped = null;
@@ -175,7 +175,7 @@ for (let i = 0; i < 24; i++) {
   const labels = i % 2 ? handed("Right", "Left") : handed("Left", "Right");
   flipped = flip([hand({ up: OPEN, thumbOut: true, at: i % 6 < 3 ? 0.30 : 0.50 }), held], labels);
 }
-assert.strictEqual(flipped, "skuba_cat", "a flipping handedness label must not swap histories");
+assert.strictEqual(flipped, "scuba_cat", "a flipping handedness label must not swap histories");
 
 // And the hand that never moved must still read as motionless.
 const quiet = flip.debug.hands.find((h) => h.motion.x < 0.01);

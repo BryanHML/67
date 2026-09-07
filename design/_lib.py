@@ -36,7 +36,7 @@ GESTURES = [
     ("nerd cat", "index finger up", ["index"], None),
     ("67 cat", "palms to the sky, bobbing", OPEN, "&#8597;"),
     ("dancing cat", "two fists pumping up and down", [], "&#8597;"),
-    ("skuba cat", "one hand still, wave the other palm", OPEN, "&#8596;"),
+    ("scuba cat", "one hand still, wave the other palm", OPEN, "&#8596;"),
 ]
 
 def gesture_row(name, desc, up, motion):
