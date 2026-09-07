@@ -699,20 +699,26 @@ btnStart.addEventListener("click", async () => {
   start.hidden = true;
   hud.hidden = false;
   strip.hidden = false;
+  // Open the gesture list straight away. Behind the ? button, nobody found it —
+  // people landed on a live camera with no idea what to do with their hands.
+  // The camera is already running underneath, so dismissing it starts play.
+  showSheet(true);
   frame();
 });
 
 // ---------- panels ----------
 
-const showSheet = (on) => {
+// Function declarations, not const: the start handler above calls showSheet,
+// and hoisting makes that independent of where these sit in the file.
+function showSheet(on) {
   sheet.hidden = !on;
   $("btnHelp").setAttribute("aria-pressed", String(on));
-};
+}
 
-const showTracking = (on) => {
+function showTracking(on) {
   dbg.hidden = overlay.hidden = !on;
   $("btnTrack").setAttribute("aria-pressed", String(on));
-};
+}
 
 $("btnHelp").addEventListener("click", () => showSheet(sheet.hidden));
 $("panelClose").addEventListener("click", () => showSheet(false));
