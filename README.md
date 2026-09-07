@@ -38,15 +38,28 @@ Both hands up. Hold one still and wave the other palm side to side.
 
 ## Run it
 
-```
+Serve the folder:
+
+```bash
 python3 -m http.server 8067
 ```
 
-Then open **http://localhost:8067** — not the `http://0.0.0.0:8067` the server
-prints, and not your LAN IP. Browsers only hand out a camera on a secure origin:
-`https://`, `localhost`, or `127.0.0.1`.
+Then, in a second terminal:
 
-To try it on your phone, deploy it (below) — you need real HTTPS for that.
+```bash
+open http://localhost:8067
+```
+
+It has to be served — opening `index.html` straight off disk fails, because
+module scripts are CORS-blocked from a `file://` origin. And it has to be
+`localhost`, not the `http://0.0.0.0:8067` the server prints and not your LAN
+IP: browsers only hand out a camera on a secure origin, meaning `https://`,
+`localhost`, or `127.0.0.1`.
+
+First load pulls about 19 MB of MediaPipe from a CDN — the WASM runtime and the
+hand model — so it needs a connection the first time. After that it's cached.
+
+To try it on your phone, deploy it (below); that needs real HTTPS.
 
 ## Deploy
 
