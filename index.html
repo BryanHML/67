@@ -1,302 +1,731 @@
 <!doctype html>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>67 — gesture meme cam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
 <style>
   :root {
-    color-scheme: dark;
+    --ink: #16141a;
+    --paper: #fffdf7;
+    --paper-2: #f4f0e6;
+    --yellow: #ffe14d;
+    --coral: #ff7a4d;
+    --verm: #d63c14;
+    --muted: #6b6675;
+
+    /* One border weight everywhere; shadows are hard offsets, never blurred. */
+    --edge: 2px solid var(--ink);
+    --lift-sm: 2px 2px 0 var(--ink);
+    --lift: 3px 3px 0 var(--ink);
+    --lift-lg: 6px 6px 0 var(--ink);
+
+    color-scheme: light;
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
+    /* dvh, not vh: mobile browser chrome collapses on scroll and vh would cut
+       the gesture strip off the bottom of the screen. */
     height: 100dvh;
     overflow: hidden;
-    background: #0b0b0f;
-    color: #e8e8ee;
-    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
-    display: grid;
-    place-items: center;
+    background: var(--ink);
+    color: var(--ink);
+    font: 400 15px/1.5 "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  #stage {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  .disp { font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+
+  .paper {
+    background-color: var(--paper);
+    background-image: radial-gradient(#16141a08 1px, #0000 1px);
+    background-size: 4px 4px;
   }
+
+  button { font: inherit; cursor: pointer; }
+
+  #stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 
   /* The canvas takes the camera's own pixel dimensions and the same CSS box and
      object-fit as the video, so the browser crops both identically and normalized
-     landmarks land on the right pixels with no transform math of our own. */
-  video,
-  #overlay {
+     landmarks need no transform math of ours. */
+  video#cam, #overlay {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: scaleX(-1);
-    /* mirror, so raising your right hand looks right */
+    transform: scaleX(-1);   /* mirror, so raising your right hand looks right */
   }
 
-  #overlay {
-    pointer-events: none;
-  }
+  #overlay { pointer-events: none; }
 
-  /* Fixed slot: every meme lands in the same box and letterboxes inside it,
-     rather than rendering at its own natural size — nerd_cat is 127px native
-     and skuba_cat is 498px, so left alone they appeared at wildly different
-     sizes. object-fit does the rest. */
-  #meme {
-    position: absolute;
-    top: 50%;
-    right: 4vw;
-    width: 400px;
-    height: 400px;
-    object-fit: contain;
-    filter: drop-shadow(0 16px 50px rgba(0, 0, 0, .65));
-    opacity: 0;
-    transition: opacity .18s ease, transform .18s ease;
-    transform: translate(28px, -50%) scale(.96);
-    pointer-events: none;
-  }
-
-  #meme.on {
-    opacity: 1;
-    transform: translate(0, -50%) scale(1);
-  }
+  /* ---------- top bar ---------- */
 
   #hud {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    padding: 14px 18px;
+    padding: max(18px, env(safe-area-inset-top)) 16px 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
-    background: linear-gradient(#000a, transparent);
-    font-variant-numeric: tabular-nums;
   }
 
-  #label {
-    font-weight: 600;
-    letter-spacing: .01em;
+  #brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--yellow);
+    border: var(--edge);
+    border-radius: 999px;
+    padding: 8px 16px;
+    box-shadow: var(--lift-sm);
   }
 
-  #hint {
-    opacity: .65;
-    font-size: 13px;
-    text-align: right;
+  #dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--verm);
   }
 
-  #msg {
-    position: absolute;
-    inset: 0;
+  #hud .tools { display: flex; gap: 8px; }
+
+  .icon-btn {
     display: grid;
     place-items: center;
-    padding: 24px;
-    text-align: center;
-    background: #0b0b0f;
+    width: 44px;
+    height: 44px;
+    background: var(--paper);
+    border: var(--edge);
+    border-radius: 999px;
+    box-shadow: var(--lift-sm);
+    color: var(--ink);
+    transition: transform .1s ease, box-shadow .1s ease;
   }
 
-  #msg[hidden] {
-    display: none;
+  .icon-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+  .icon-btn[aria-pressed="true"] { background: var(--yellow); }
+
+  /* ---------- meme card ---------- */
+
+  #meme {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    width: 440px;
+    padding: 20px;
+    border: var(--edge);
+    border-radius: 22px;
+    box-shadow: var(--lift-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    opacity: 0;
+    transform: translate(28px, -50%) scale(.97);
+    transition: opacity .18s ease, transform .18s ease;
+    pointer-events: none;
   }
+
+  #meme.on { opacity: 1; transform: translate(0, -50%) scale(1); }
+
+  /* Fixed slot: every clip lands in the same box and letterboxes inside it.
+     Left to their natural sizes, nerd_cat (127px) rendered at a quarter of
+     skuba_cat (498px). */
+  #slot {
+    display: grid;
+    place-items: center;
+    width: 400px;
+    height: 400px;
+    background: var(--yellow);
+    border: var(--edge);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  #memeVid { width: 100%; height: 100%; object-fit: contain; }
+
+  #meme .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  #memeName {
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -.02em;
+  }
+
+  .badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--paper);
+    background: var(--verm);
+    border-radius: 999px;
+    padding: 5px 11px;
+    white-space: nowrap;
+  }
+
+  .badge:empty { display: none; }
+
+  /* ---------- gesture strip ---------- */
+
+  #strip {
+    position: absolute;
+    left: 50%;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    display: flex;
+    gap: 9px;
+  }
+
+  .tile {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: var(--edge);
+    box-shadow: var(--lift-sm);
+    background: var(--yellow);
+    transition: transform .12s ease;
+  }
+
+  .tile.move { background: var(--coral); }
+  .tile.hit { transform: translateY(-6px) scale(1.08); }
+
+  /* ---------- readout ---------- */
 
   #debug {
     position: absolute;
-    left: 18px;
-    bottom: 18px;
+    left: 20px;
+    bottom: max(20px, env(safe-area-inset-bottom));
     margin: 0;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: #000000b0;
-    border: 1px solid #ffffff1a;
-    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
-    white-space: pre;
+    padding: 12px 16px;
+    background: var(--paper);
+    border: var(--edge);
+    border-radius: 14px;
+    box-shadow: var(--lift);
+    font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
     letter-spacing: .02em;
+    white-space: pre;
   }
 
-  #debug .hit {
-    color: #7ee787;
+  #debug .hit { color: var(--verm); font-weight: 600; }
+  #debug .dim { opacity: .38; }
+
+  /* ---------- panels: start screen and instructions ---------- */
+
+  #start, #sheet {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    padding: 24px;
   }
 
-  #debug .dim {
-    opacity: .45;
+  #sheet { background: #0e0d13b8; }
+
+  #start { background: transparent; }
+
+  #startInner {
+    /* Above #start::before, which is absolutely positioned and would otherwise
+       paint over this in-flow content. */
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 620px;
   }
 
-  /* Narrow screens only shrink the slot — it stays right-aligned like the
-     desktop layout, so the meme always enters from the same edge. */
-  @media (max-width: 640px) {
+  #start::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(90% 70% at 50% 0%, #ffe14d3d 0%, #0000 70%),
+      var(--paper);
+    background-image:
+      radial-gradient(90% 70% at 50% 0%, #ffe14d3d 0%, #0000 70%),
+      radial-gradient(#16141a08 1px, #0000 1px);
+    background-size: auto, 4px 4px;
+    background-color: var(--paper);
+  }
+
+  #startTiles { display: flex; gap: 12px; margin-bottom: 30px; }
+
+  #startTiles .tile {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    box-shadow: var(--lift);
+  }
+
+  h1 {
+    margin: 0 0 16px;
+    font-weight: 800;
+    font-size: clamp(40px, 9vw, 68px);
+    line-height: .92;
+    letter-spacing: -.035em;
+    text-wrap: pretty;
+  }
+
+  .lede {
+    margin: 0 0 32px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+
+  .cta {
+    min-height: 54px;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--paper);
+    background: var(--ink);
+    border: var(--edge);
+    border-radius: 999px;
+    padding: 15px 40px;
+    box-shadow: 5px 5px 0 var(--yellow);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+
+  .cta:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--yellow); }
+  .cta:disabled { opacity: .55; box-shadow: none; cursor: default; }
+
+  .fine {
+    margin: 16px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 40ch;
+  }
+
+  .fine.error { color: var(--verm); font-weight: 500; }
+
+  /* instructions panel */
+
+  #panel {
+    position: relative;
+    width: min(640px, 100%);
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    border: var(--edge);
+    border-radius: 22px;
+    padding: 32px 34px 28px;
+    box-shadow: var(--lift-lg);
+  }
+
+  .kicker {
+    display: inline-block;
+    background: var(--yellow);
+    border: var(--edge);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    margin-bottom: 14px;
+  }
+
+  #panel h2 {
+    margin: 0 0 10px;
+    font-weight: 800;
+    font-size: clamp(32px, 6vw, 44px);
+    line-height: .96;
+    letter-spacing: -.025em;
+    text-wrap: pretty;
+  }
+
+  #panel p.intro {
+    margin: 0 0 24px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 46ch;
+  }
+
+  #panel p.intro strong { color: var(--verm); }
+
+  #panelClose { position: absolute; top: 26px; right: 26px; }
+
+  #rows { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 60px;
+    background: var(--paper-2);
+    border: var(--edge);
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+
+  .row .tile { box-shadow: none; width: 40px; height: 40px; border-radius: 11px; }
+  .row .text { flex-grow: 1; min-width: 0; }
+  .row .name { font-weight: 600; font-size: 15.5px; }
+  .row .how { font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+
+  .arrow {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--verm);
+    color: var(--paper);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #panel footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  #panel footer p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 34ch; }
+
+  #panel footer .cta { font-size: 16px; padding: 13px 28px; box-shadow: var(--lift); }
+  #panel footer .cta:active { box-shadow: none; }
+
+  [hidden] { display: none !important; }
+
+  /* A 400px slot makes the card ~494px tall. On a short desktop window that
+     would clip off the bottom, so the slot steps down rather than overflowing. */
+  @media (min-width: 701px) and (max-height: 620px) {
+    #meme { width: 340px; }
+    #slot { width: 300px; height: 300px; }
+  }
+
+  /* ---------- phone ---------- */
+
+  @media (max-width: 700px) {
+    /* Portrait has no room beside the video, so the meme moves under it,
+       full width, and the label sits below the clip rather than beside it. */
     #meme {
-      width: 300px;
-      height: 300px;
+      top: auto;
+      bottom: calc(max(20px, env(safe-area-inset-bottom)) + 74px);
+      left: 14px;
+      right: 14px;
+      width: auto;
+      padding: 14px;
+      border-radius: 20px;
+      box-shadow: var(--lift);
+      transform: translateY(20px) scale(.97);
     }
-  }
 
-  kbd {
-    font: inherit;
-    background: #ffffff14;
-    border: 1px solid #ffffff1f;
-    border-radius: 5px;
-    padding: 1px 6px;
+    #meme.on { transform: translateY(0) scale(1); }
+
+    #slot { width: 100%; height: min(300px, 38dvh); }
+
+    #memeName { font-size: 22px; }
+
+    #strip { left: 14px; right: 14px; transform: none; }
+    #strip .tile { flex-grow: 1; width: auto; height: 54px; }
+
+    /* Nobody tunes thresholds on a phone. */
+    #debug { display: none; }
+
+    #panel { padding: 26px 20px 22px; border-radius: 20px; }
+    #panelClose { top: 18px; right: 18px; }
+
+    #panel footer { flex-direction: column; align-items: stretch; gap: 14px; }
+    #panel footer .cta { width: 100%; }
+    #panel footer p { max-width: none; text-align: center; order: 2; }
+
+    #startTiles .tile { width: 54px; height: 54px; border-radius: 15px; }
   }
 </style>
 
 <div id="stage">
   <video id="cam" autoplay playsinline muted></video>
   <canvas id="overlay" hidden></canvas>
-  <video id="meme" muted loop playsinline preload="auto"></video>
-  <div id="hud">
-    <span id="label">—</span>
-    <span id="hint">
-      ☝️ nerd &nbsp; 🙌 palms up, bobbing = 67 &nbsp; 🤛🤜 fists pumping = dancing
-      &nbsp; 🤝 one hand still + wave the other = skuba
-      &nbsp;·&nbsp; <kbd>d</kbd> tracking
-    </span>
+
+  <div id="hud" hidden>
+    <div id="brand">
+      <span id="dot"></span>
+      <span class="disp" style="font-weight: 800; font-size: 16px;">67</span>
+    </div>
+    <div class="tools">
+      <button id="btnHelp" class="icon-btn" type="button" aria-label="Gestures" aria-pressed="false">
+        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M7.5 7.2a2.6 2.6 0 1 1 3.2 2.6c-.5.2-.7.6-.7 1.1v.6"/><path d="M10 14.6v.5"/>
+        </svg>
+      </button>
+      <button id="btnTrack" class="icon-btn" type="button" aria-label="Tracking overlay" aria-pressed="false">
+        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7V4.5A1.5 1.5 0 0 1 4.5 3H7M13 3h2.5A1.5 1.5 0 0 1 17 4.5V7M17 13v2.5a1.5 1.5 0 0 1-1.5 1.5H13M7 17H4.5A1.5 1.5 0 0 1 3 15.5V13"/>
+          <circle cx="10" cy="10" r="2.4"/>
+        </svg>
+      </button>
+    </div>
   </div>
+
+  <div id="meme" class="paper">
+    <div id="slot"><video id="memeVid" muted loop playsinline preload="auto"></video></div>
+    <div class="meta">
+      <span id="memeName" class="disp"></span>
+      <span id="memeBadge" class="badge"></span>
+    </div>
+  </div>
+
+  <div id="strip" hidden></div>
   <pre id="debug" hidden></pre>
-  <div id="msg">Loading the hand model…</div>
+
+  <div id="sheet" hidden>
+    <div id="panel" class="paper">
+      <button id="panelClose" class="icon-btn" type="button" aria-label="Close">
+        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>
+      </button>
+      <span class="kicker">HOW TO PLAY</span>
+      <h2 class="disp">Make the shape.<br>Get the cat.</h2>
+      <p class="intro">Hold it for about a second. The three marked <strong>MOVE</strong> need real movement &mdash; stay still and nothing happens.</p>
+      <div id="rows"></div>
+      <footer>
+        <p>Runs entirely in your browser &mdash; the camera never leaves this device.</p>
+        <button id="panelDone" class="cta disp" type="button">Got it</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="start">
+    <div id="startInner">
+      <div id="startTiles"></div>
+      <h1 class="disp">Sixty&#8209;seven</h1>
+      <p class="lede">Four hand gestures. Four cats. Your camera never leaves this device.</p>
+      <button id="btnStart" class="cta disp" type="button" disabled>Loading&hellip;</button>
+      <p id="startNote" class="fine">Your browser will ask permission next.</p>
+    </div>
+  </div>
 </div>
 
 <script type="module">
-  import { makeReader, SHAKE } from "./gestures.js";
+import { makeReader, SHAKE } from "./gestures.js";
 
-  const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
-  // All four are looping MP4s: as GIFs they totalled 28.5 MB, which every
-  // visitor downloaded before seeing anything. Same clips, 203 KB.
-  const MEMES = ["67_cat", "nerd_cat", "skuba_cat", "dancing_cat"];
+const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1";
 
-  const cam = document.getElementById("cam");
-  const meme = document.getElementById("meme");
-  const label = document.getElementById("label");
-  const msg = document.getElementById("msg");
+// Yellow means hold the gesture, coral means move it. That is the only thing
+// colour encodes here, so the badges stay readable.
+const GESTURES = [
+  { id: "nerd_cat",    name: "nerd cat",    how: "index finger up",                     up: ["index"],  move: "" },
+  { id: "67_cat",      name: "67 cat",      how: "both palms to the sky, bobbing",      up: "open",     move: "↕" },
+  { id: "dancing_cat", name: "dancing cat", how: "two fists pumping up and down",       up: [],         move: "↕" },
+  { id: "skuba_cat",   name: "skuba cat",   how: "one hand still, wave the other palm", up: "open",     move: "↔" },
+];
 
-  // Warm the HTTP cache so the first gesture doesn't show a blank frame.
-  const preloaded = Object.fromEntries(MEMES.map(n => {
-    const url = `memes/${n}.mp4`;
-    fetch(url).catch(() => {});
-    return [n, url];
-  }));
+const OPEN = ["index", "middle", "ring", "pinky", "thumb"];
 
-  const fail = (text) => { msg.hidden = false; msg.textContent = text; };
+// One schematic hand on a 26x26 grid: extended fingers reach past the palm,
+// curled ones stub just above it — the same distinction classify() makes.
+function handIcon(up, size) {
+  const fingers = up === "open" ? OPEN : up;
+  const seg = { index: ["M8 14V5", "M8 14v-2"], middle: ["M11.5 14V3.5", "M11.5 14v-2"],
+                ring: ["M15 14V5", "M15 14v-2"], pinky: ["M18 14V7", "M18 14v-2"] };
+  const paths = Object.entries(seg)
+    .map(([k, [ext, curl]]) => `<path d="${fingers.includes(k) ? ext : curl}"/>`).join("");
+  const thumb = fingers.includes("thumb") ? "M5.5 17 2.8 15" : "M5.5 17 3.5 15.8";
+  return `<svg viewBox="0 0 26 26" width="${size}" height="${size}" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5.5" y="14" width="13" height="9.5" rx="3.5"/>${paths}<path d="${thumb}"/></svg>`;
+}
 
-  let landmarker, drawUtils, CONNECTIONS;
-  try {
-    const { FilesetResolver, HandLandmarker, DrawingUtils } = await import(`${MP}/vision_bundle.mjs`);
-    CONNECTIONS = HandLandmarker.HAND_CONNECTIONS;
-    // Built here because DrawingUtils is scoped to this block.
-    drawUtils = new DrawingUtils(document.getElementById("overlay").getContext("2d"));
-    const vision = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
-    landmarker = await HandLandmarker.createFromOptions(vision, {
-      baseOptions: {
-        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
-        delegate: "GPU",
-      },
-      runningMode: "VIDEO",
-      numHands: 2,
-      // Below the 0.5 defaults on purpose: a hand pumping fast is blurred, and a
-      // strict threshold makes MediaPipe give up and fall back to re-running the
-      // palm detector, dropping frames right when the motion matters most.
-      minHandPresenceConfidence: 0.4,
-      minTrackingConfidence: 0.4,
-    });
-  } catch (e) {
-    fail(`Couldn't load the hand model. ${e.message}`);
-    throw e;
-  }
+const $ = (id) => document.getElementById(id);
+const cam = $("cam"), overlay = $("overlay"), hud = $("hud"), strip = $("strip"), dbg = $("debug");
+const memeCard = $("meme"), memeVid = $("memeVid"), memeName = $("memeName"), memeBadge = $("memeBadge");
+const sheet = $("sheet"), start = $("start"), btnStart = $("btnStart"), startNote = $("startNote");
 
-  msg.textContent = "Allow camera access to start.";
+// Build the instructions rows and the reminder strip from one list.
+$("rows").innerHTML = GESTURES.map((g) => `
+  <div class="row">
+    <span class="tile${g.move ? " move" : ""}">${handIcon(g.up, 23)}</span>
+    <span class="text"><span class="name disp">${g.name}</span><span class="how" style="display:block">${g.how}</span></span>
+    ${g.move ? `<span class="arrow">${g.move}</span>` : ""}
+  </div>`).join("");
+
+strip.innerHTML = GESTURES.map((g) =>
+  `<span class="tile${g.move ? " move" : ""}" data-id="${g.id}" title="${g.name}">${handIcon(g.up, 22)}</span>`).join("");
+
+$("startTiles").innerHTML = GESTURES.map((g, i) =>
+  `<span class="tile${g.move ? " move" : ""}" style="transform: rotate(${[-7, 4, -3, 6][i]}deg)">${handIcon(g.up, 30)}</span>`).join("");
+
+// Warm the HTTP cache so the first gesture doesn't show a blank frame.
+const clips = Object.fromEntries(GESTURES.map((g) => {
+  const url = `memes/${g.id}.mp4`;
+  fetch(url).catch(() => {});
+  return [g.id, url];
+}));
+
+const fail = (text) => { startNote.textContent = text; startNote.classList.add("error"); };
+
+// ---------- model ----------
+
+let landmarker, drawUtils, CONNECTIONS;
+try {
+  const { FilesetResolver, HandLandmarker, DrawingUtils } = await import(`${MP}/vision_bundle.mjs`);
+  CONNECTIONS = HandLandmarker.HAND_CONNECTIONS;
+  drawUtils = new DrawingUtils(overlay.getContext("2d"));
+  const vision = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
+  landmarker = await HandLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO",
+    numHands: 2,
+    // Below the 0.5 defaults on purpose: a hand pumping fast is blurred, and a
+    // strict threshold makes MediaPipe give up and fall back to re-running the
+    // palm detector, dropping frames right when the motion matters most.
+    minHandPresenceConfidence: 0.4,
+    minTrackingConfidence: 0.4,
+  });
+  btnStart.disabled = false;
+  btnStart.textContent = "Allow camera & start";
+} catch (e) {
+  fail(`Couldn't load the hand model. ${e.message}`);
+  throw e;
+}
+
+// ---------- camera ----------
+
+btnStart.addEventListener("click", async () => {
+  btnStart.disabled = true;
+  btnStart.textContent = "Starting…";
   try {
     cam.srcObject = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user", width: { ideal: 1280 } },
     });
     await cam.play();
   } catch (e) {
-    // getUserMedia only exists on a secure context: https://, localhost or 127.0.0.1.
-    // Note that http://0.0.0.0 — what `python3 -m http.server` prints — is NOT one.
+    btnStart.disabled = false;
+    btnStart.textContent = "Try again";
+    // getUserMedia only exists on a secure context: https://, localhost or
+    // 127.0.0.1. http://0.0.0.0 — what `python3 -m http.server` prints — is not one.
     fail(navigator.mediaDevices
-      ? "Camera blocked. Allow it in your browser's address bar, then reload."
+      ? "Camera blocked. Allow it in your browser's address bar, then try again."
       : `No camera on ${location.origin} — browsers only allow it on https://, ` +
-      `http://localhost or http://127.0.0.1. Try http://localhost:${location.port || 80}.`);
-    throw e;
+        `http://localhost or http://127.0.0.1. Try http://localhost:${location.port || 80}.`);
+    return;
   }
-  msg.hidden = true;
-
-  const read = makeReader({ hold: 5, linger: 70 });   // ~3s});
-  const dbg = document.getElementById("debug");
-  const overlay = document.getElementById("overlay");
-
-  // One key for "show me what the model sees": skeleton and readout together.
-  addEventListener("keydown", (e) => {
-    if (e.key !== "d") return;
-    dbg.hidden = overlay.hidden = !dbg.hidden;
-  });
-
-  // Draw the 21 landmarks and the bone connections MediaPipe defines between them.
-  function drawSkeleton(hands) {
-    const ctx = overlay.getContext("2d");
-    if (overlay.width !== cam.videoWidth) {
-      overlay.width = cam.videoWidth;
-      overlay.height = cam.videoHeight;
-    }
-    ctx.clearRect(0, 0, overlay.width, overlay.height);
-    for (const lm of hands) {
-      drawUtils.drawConnectors(lm, CONNECTIONS, { color: "#7ee787cc", lineWidth: 4 });
-      drawUtils.drawLandmarks(lm, { color: "#0b0b0f", fillColor: "#7ee787", lineWidth: 1, radius: 4 });
-    }
-  }
-
-  const FOUR = ["index", "middle", "ring", "pinky"];
-  const esc = (s) => String(s).replace(/[<&]/g, (c) => (c === "<" ? "&lt;" : "&amp;"));
-
-  // One line per hand: which fingers are extended, and how far the hand has
-  // travelled on each axis in the last 20 frames. ▲ marks a value over SHAKE.
-  function renderDebug(d) {
-    if (!d) return;
-    const travel = (v) => {
-      const over = v >= SHAKE;
-      return `<span class="${over ? "hit" : "dim"}">${over ? "▲" : " "}${v.toFixed(3)}</span>`;
-    };
-    const rows = d.hands.map((h) => {
-      const bits = FOUR.map((n) => (h.fingers[n]
-        ? `<span class="hit">${n[0].toUpperCase()}</span>`
-        : '<span class="dim">·</span>')).join("");
-      const thumb = h.fingers.thumb ? '<span class="hit">T</span>' : '<span class="dim">·</span>';
-      return `${esc(h.side).padEnd(5)} ${bits} ${thumb}   x${travel(h.motion.x)}  y${travel(h.motion.y)}`;
-    });
-    if (!rows.length) rows.push('<span class="dim">no hands</span>');
-    rows.push(`match ${esc(d.raw ?? "—").padEnd(12)} ${d.raw ? `${d.held}/${d.need} frames` : ""}`);
-    dbg.innerHTML = rows.join("\n");
-  }
-
-  let lastTs = -1, shown = null;
-
-  function frame() {
-    // detectForVideo throws if handed the same timestamp twice.
-    if (cam.currentTime !== lastTs) {
-      lastTs = cam.currentTime;
-      const { landmarks, handedness } = landmarker.detectForVideo(cam, performance.now());
-      const gesture = read(landmarks, handedness);
-
-      if (gesture !== shown) {
-        shown = gesture;
-        label.textContent = gesture ? gesture.replace("_", " ") : "—";
-        if (gesture) {
-          meme.src = preloaded[gesture];
-          // Muted autoplay is allowed, but play() still rejects if the tab is
-          // backgrounded — the meme just appears paused, which is survivable.
-          meme.play().catch(() => {});
-        }
-        meme.classList.toggle("on", Boolean(gesture));
-      }
-      if (!dbg.hidden) { renderDebug(read.debug); drawSkeleton(landmarks); }
-    }
-    requestAnimationFrame(frame);
-  }
+  start.hidden = true;
+  hud.hidden = false;
+  strip.hidden = false;
   frame();
+});
+
+// ---------- panels ----------
+
+const showSheet = (on) => {
+  sheet.hidden = !on;
+  $("btnHelp").setAttribute("aria-pressed", String(on));
+};
+
+const showTracking = (on) => {
+  dbg.hidden = overlay.hidden = !on;
+  $("btnTrack").setAttribute("aria-pressed", String(on));
+};
+
+$("btnHelp").addEventListener("click", () => showSheet(sheet.hidden));
+$("panelClose").addEventListener("click", () => showSheet(false));
+$("panelDone").addEventListener("click", () => showSheet(false));
+$("btnTrack").addEventListener("click", () => showTracking(overlay.hidden));
+
+addEventListener("keydown", (e) => {
+  if (e.key === "d") showTracking(overlay.hidden);
+  else if (e.key === "?" || e.key === "/") showSheet(sheet.hidden);
+  else if (e.key === "Escape") showSheet(false);
+});
+
+// ---------- debug readout ----------
+
+const FOUR = ["index", "middle", "ring", "pinky"];
+const esc = (s) => String(s).replace(/[<&]/g, (c) => (c === "<" ? "&lt;" : "&amp;"));
+
+// One line per hand: which fingers are extended, and how far the hand has
+// travelled on each axis over the last 20 frames. A triangle marks a value
+// over SHAKE. The hand count matters as much as the poses — every gesture but
+// nerd needs two, so a dropped hand blocks them however good the pose is.
+function renderDebug(d) {
+  if (!d) return;
+  const travel = (v) => {
+    const over = v >= SHAKE;
+    return `<span class="${over ? "hit" : "dim"}">${over ? "▲" : " "}${v.toFixed(3)}</span>`;
+  };
+  const rows = d.hands.map((h) => {
+    const bits = FOUR.map((n) => (h.fingers[n]
+      ? `<span class="hit">${n[0].toUpperCase()}</span>`
+      : '<span class="dim">·</span>')).join("");
+    const thumb = h.fingers.thumb ? '<span class="hit">T</span>' : '<span class="dim">·</span>';
+    return `${esc(h.side).padEnd(5)} ${bits} ${thumb}   x${travel(h.motion.x)}  y${travel(h.motion.y)}`;
+  });
+  if (!rows.length) rows.push('<span class="dim">no hands</span>');
+  const n = d.hands.length;
+  rows.push(`match ${esc(d.raw ?? "—").padEnd(12)} ${n} hand${n === 1 ? "" : "s"}`
+    + (d.raw ? `  ${d.held}/${d.need}` : ""));
+  dbg.innerHTML = rows.join("\n");
+}
+
+// Draw the 21 landmarks and the bone connections MediaPipe defines between them.
+function drawSkeleton(hands) {
+  const ctx = overlay.getContext("2d");
+  if (overlay.width !== cam.videoWidth) {
+    overlay.width = cam.videoWidth;
+    overlay.height = cam.videoHeight;
+  }
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+  for (const lm of hands) {
+    drawUtils.drawConnectors(lm, CONNECTIONS, { color: "#ffe14dcc", lineWidth: 4 });
+    drawUtils.drawLandmarks(lm, { color: "#16141a", fillColor: "#ffe14d", lineWidth: 1, radius: 4 });
+  }
+}
+
+// ---------- loop ----------
+
+const read = makeReader({ hold: 5 });
+const byId = Object.fromEntries(GESTURES.map((g) => [g.id, g]));
+let lastTs = -1, shown = null;
+
+function frame() {
+  // detectForVideo throws if handed the same timestamp twice.
+  if (cam.currentTime !== lastTs) {
+    lastTs = cam.currentTime;
+    const { landmarks, handedness } = landmarker.detectForVideo(cam, performance.now());
+    const gesture = read(landmarks, handedness);
+
+    if (gesture !== shown) {
+      shown = gesture;
+      const g = byId[gesture];
+      if (g) {
+        memeName.textContent = g.name;
+        memeBadge.textContent = g.move ? `MOVE ${g.move}` : "";
+        memeVid.src = clips[g.id];
+        // Muted autoplay is allowed, but play() still rejects if the tab is
+        // backgrounded — the meme just appears paused, which is survivable.
+        memeVid.play().catch(() => {});
+      }
+      memeCard.classList.toggle("on", Boolean(g));
+      for (const t of strip.children) t.classList.toggle("hit", t.dataset.id === gesture);
+    }
+
+    if (!overlay.hidden) { renderDebug(read.debug); drawSkeleton(landmarks); }
+  }
+  requestAnimationFrame(frame);
+}
 </script>

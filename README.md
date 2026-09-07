@@ -73,11 +73,29 @@ The clips under `demo/` are the gesture instructions above. Those stay GIFs on
 purpose: GitHub renders a GIF inline in a README and loops it, while a relative
 `.mp4` path renders as a bare link.
 
+## Controls
+
+`?` opens the gesture list, `d` toggles the tracking overlay — the hand skeleton
+plus a per-hand readout of which fingers are extended, how far each hand has
+travelled on each axis, and how many hands MediaPipe found. Both have buttons in
+the top-right too. The readout is hidden on phones.
+
 ## Changing gestures
 
 All the logic is `classify()` in [gestures.js](gestures.js) — a lookup from
-which fingers are extended to a meme name. Add a case, drop an MP4 in `memes/`,
-add it to `MEMES` in `index.html`.
+which fingers are extended to a meme name. Add a case there, drop an MP4 in
+`memes/`, and add an entry to `GESTURES` in `index.html`:
+
+```js
+{ id: "new_cat", name: "new cat", how: "what to do with your hand",
+  up: ["index"],   // extended fingers, or "open" for all of them
+  move: "↕" }      // "" for a held pose; ↕ or ↔ for a motion gesture
+```
+
+`id` is both the `classify()` return value and the filename. That one entry
+drives the instructions panel, the reminder strip along the bottom, the start
+screen, and the clip that plays — there is nowhere else to register it. `move`
+also picks the tile colour: yellow for hold, coral for move.
 
 ```
 node gestures.test.mjs
