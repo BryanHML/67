@@ -4,7 +4,13 @@
 <title>67 — gesture meme cam</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<!-- Loaded non-blocking. A plain stylesheet link stops the browser painting
+     ANYTHING until it resolves, so on a network that filters fonts.googleapis.com
+     the whole page stays blank rather than falling back. media="print" takes it
+     off the critical path; onload promotes it once it arrives. -->
+<link rel="stylesheet" media="print" onload="this.media='all'; this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap"></noscript>
 
 <style>
   :root {
