@@ -100,6 +100,7 @@
   #hud .tools { display: flex; gap: 8px; }
 
   .icon-btn {
+    position: relative;
     display: grid;
     place-items: center;
     width: 44px;
@@ -114,6 +115,36 @@
 
   .icon-btn:active { transform: translate(2px, 2px); box-shadow: none; }
   .icon-btn[aria-pressed="true"] { background: var(--yellow); }
+
+  /* Tooltip. Guarded on [data-tip] so the panel's close button — same class,
+     no tip — doesn't render an empty pill. Right-aligned because these sit in
+     the top-right corner and a centred one would overflow the viewport.
+     hover: hover keeps it off touch screens, where there is no hover to end. */
+  @media (hover: hover) {
+    .icon-btn[data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      padding: 6px 12px;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity .12s ease, transform .12s ease;
+      pointer-events: none;
+    }
+
+    .icon-btn[data-tip]:hover::after,
+    .icon-btn[data-tip]:focus-visible::after {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   /* ---------- meme card ---------- */
 
@@ -466,12 +497,12 @@
       <span class="disp" style="font-weight: 800; font-size: 16px;">67</span>
     </div>
     <div class="tools">
-      <button id="btnHelp" class="icon-btn" type="button" aria-label="Gestures" aria-pressed="false">
+      <button id="btnHelp" class="icon-btn" type="button" aria-label="Gestures" aria-pressed="false" data-tip="Gestures · ?">
         <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <path d="M7.5 7.2a2.6 2.6 0 1 1 3.2 2.6c-.5.2-.7.6-.7 1.1v.6"/><path d="M10 14.6v.5"/>
         </svg>
       </button>
-      <button id="btnTrack" class="icon-btn" type="button" aria-label="Tracking overlay" aria-pressed="false">
+      <button id="btnTrack" class="icon-btn" type="button" aria-label="Debug overlay" aria-pressed="false" data-tip="Debug overlay · D">
         <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7V4.5A1.5 1.5 0 0 1 4.5 3H7M13 3h2.5A1.5 1.5 0 0 1 17 4.5V7M17 13v2.5a1.5 1.5 0 0 1-1.5 1.5H13M7 17H4.5A1.5 1.5 0 0 1 3 15.5V13"/>
           <circle cx="10" cy="10" r="2.4"/>
