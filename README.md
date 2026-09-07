@@ -1,8 +1,11 @@
 # 67
 
-Webcam meme cam. Throw a hand gesture, get the matching cat.
+Is your brainrot level as peaked as mine? Now you can interact with your
+favourite cat memes with your own hands.
 
-Try it on my [demo site](https://bryanhml.github.io/67/) or run it entirely in the browser — MediaPipe Hands via WASM. Your camera feed never leaves your device, so there's nothing to host but static files.
+Try it on [my demo site](https://bryanhml.github.io/67/) or run it entirely
+in the browser — MediaPipe Hands via WASM. Your camera feed never leaves your
+device, so there's nothing to host but static files.
 
 Three of the four are *motion* gestures — held still they do nothing, because
 the app watches a hand travel back and forth, not just its finger pose. They are
